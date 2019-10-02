@@ -6,6 +6,11 @@ const app = express();
 app.get('/', function (req, res) {
     const id = req.query.id;
     DB.find(id).then(rows => {
+        if (rows.length === 0) {
+            res.end('incorrect id');
+            return;
+        }
+        
         const row = rows[0];
         const port = row.url.split(':').length === 3 ? +row.url.split(':')[1] : 80;
         const options = {

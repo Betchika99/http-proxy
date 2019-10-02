@@ -1,14 +1,23 @@
 'use strict';
 
 const { Client } = require('pg');
+const fs = require('fs');
 const DB_OPTIONS = require('./config').DB_OPTIONS;
-// const conString = 'postgres://admin:12345@localhost/proxy';
+const DB_FILE = require('./config').DB_FILE;
 
 class DB {
     constructor() {
+        const sqlScript = fs.readFileSync(DB_FILE).toString();
+
         this.connection = new Client(DB_OPTIONS);
         this.connection.connect();
         console.log("DB connected successfully!");
+
+        this.connection.query(sqlScript, (err, res) => {
+            if (err) {
+                console.error(err);
+            }
+        });
     }
 
     create(method, url, headers, body) {

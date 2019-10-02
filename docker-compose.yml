@@ -1,0 +1,22 @@
+version: '3.5'
+
+services:
+  app:
+    build: .
+    container_name: http-proxy
+    ports:
+      - 8081:8081
+      - 3000:3000
+    depends_on:
+      - proxy_postgres
+
+  proxy_postgres:
+    image: postgres:latest
+    ports:
+      - 5433:5432
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=12345
+      - POSTGRES_DB=proxy
+    container_name: proxy_postgres
+    restart: on-failure

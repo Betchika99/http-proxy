@@ -31,9 +31,9 @@ class ProxyServer {
             //TODO: переименовать хедеры под прокси
             headers: clientRequest.headers,
             agent: new http.Agent({ keepAlive: this.keepAlive })
-        }; 
-        
-        clientRequest.on('data', (body) => {
+        };
+
+        const answer = body => {
             DB.create(options.method, options.path, options.headers, body);
 
             const request = http.request(options);
@@ -52,7 +52,15 @@ class ProxyServer {
             request.on('error', (error) => {
                 console.log(error);
             });
-        });
+        }
+
+        if (options.headers['content-length']) {
+            clientRequest.on('data', (body) => {
+                answer(body);
+            });
+        } else {
+            answer('');
+        }
     }
 
     onListen() {
