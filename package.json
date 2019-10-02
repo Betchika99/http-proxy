@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/Betchika99/http-proxy/issues"
   },
-  "homepage": "https://github.com/Betchika99/http-proxy#readme"
+  "homepage": "https://github.com/Betchika99/http-proxy#readme",
+  "dependencies": {
+    "pg": "^7.12.1"
+  }
 }

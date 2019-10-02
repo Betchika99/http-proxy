@@ -4,6 +4,7 @@ const net = require('net');
 const url = require('url');
 const EVENTS = require('./config').EVENTS;
 const PROXY_SERVER_OPTIONS = require('./config').PROXY_SERVER_OPTIONS;
+const DB = require('./db')();
 
 class ProxyServer {
     constructor() {
@@ -12,7 +13,6 @@ class ProxyServer {
     }
 
     create() {
-        // this.serverInstance = http.createServer(this.onConnect);
         this.serverInstance = http.createServer();
 
         // this.serverInstance.on(EVENTS.CONNECT, this.proxing);
@@ -22,7 +22,6 @@ class ProxyServer {
     }
 
     onRequest(clientRequest, proxyResponse) {
-    // onConnect(request, response) {
         const port = clientRequest.url.split(':').length === 2 ? +clientRequest.url.split(':')[1] : 80;
         const options = {
             method: clientRequest.method,
@@ -32,7 +31,14 @@ class ProxyServer {
             //TODO: переименовать хедеры под прокси
             headers: clientRequest.headers,
             agent: new http.Agent({ keepAlive: this.keepAlive })
-        };  
+        }; 
+        
+        const body = ''
+        clientRequest.on('data', (chunk) => {
+            body += chunk;
+        });
+
+        DB.create(options.method, options.path, options.headers, body, 'requests');
 
         const request = http.request(options);
         request.end();
