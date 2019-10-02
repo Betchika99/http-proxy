@@ -11,8 +11,8 @@ class DB {
         console.log("DB connected successfully!");
     }
 
-    create(method, url, headers, body, table) {
-        const insertQuery = `INSERT INTO ${table} (method, url, headers, body) VALUES ($1, $2, $3, $4)`;
+    create(method, url, headers, body) {
+        const insertQuery = `INSERT INTO requests (method, url, headers, body) VALUES ($1, $2, $3, $4)`;
         this.connection.query(insertQuery,[
             method,
             url,
@@ -22,6 +22,19 @@ class DB {
             if (err) {
                 console.error(err);
             }
+        });
+    }
+
+    find(id) {
+        return new Promise((resolve, reject) => {
+            const selectQuery = 'SELECT * FROM requests WHERE id = $1';
+            this.connection.query(selectQuery,[id], (err, res) => {
+                if (err) {
+                    console.error(err);
+                    reject(err);
+                }
+                resolve(res.rows);
+            });
         });
     }
 

@@ -33,29 +33,25 @@ class ProxyServer {
             agent: new http.Agent({ keepAlive: this.keepAlive })
         }; 
         
-        const body = ''
-        clientRequest.on('data', (chunk) => {
-            body += chunk;
-        });
+        clientRequest.on('data', (body) => {
+            DB.create(options.method, options.path, options.headers, body);
 
-        DB.create(options.method, options.path, options.headers, body, 'requests');
+            const request = http.request(options);
+            request.end(body);
 
-        const request = http.request(options);
-        request.end();
-
-        request.on('response', (serverResponse) => {
-            console.log('serverResponse');
-            proxyResponse.writeHead(serverResponse.statusCode, serverResponse.statusMessage, serverResponse.headers);
-            serverResponse.on('data', (chunk) => {
-                proxyResponse.end(chunk);
+            request.on('response', (serverResponse) => {
+                proxyResponse.writeHead(serverResponse.statusCode, serverResponse.statusMessage, serverResponse.headers);
+                serverResponse.on('data', (chunk) => {
+                    proxyResponse.end(chunk);
+                });
+                serverResponse.on('close', () => {
+                    console.log('close');
+                });
             });
-            serverResponse.on('close', () => {
-                console.log('close');
-            });
-        });
 
-        request.on('error', (error) => {
-            console.log(error);
+            request.on('error', (error) => {
+                console.log(error);
+            });
         });
     }
 
